@@ -42,8 +42,10 @@ A comprehensive, production-ready Employee Management System built with Django a
 - [License](#-license)
 
 ## 📸 Screenshots
+<img width="1365" height="671" alt="image" src="https://github.com/user-attachments/assets/8ebd6947-926c-4c1a-9d9c-531890b901f4" />
+<img width="1360" height="455" alt="image" src="https://github.com/user-attachments/assets/b03bb296-37d7-40eb-8823-1e1c3fe1b044" />
+<img width="1351" height="604" alt="image" src="https://github.com/user-attachments/assets/30f65d5a-7266-4288-98b6-25597876b264" />
 
-> *Coming Soon: Dashboard, Employee List, and Profile Screenshots*
 
 ## ✨ Features
 
