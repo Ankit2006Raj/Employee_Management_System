@@ -1,0 +1,116 @@
+{% extends 'employee/base.html' %}
+
+{% block title %}Positions - EMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4 animate__animated animate__fadeIn">
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold mb-2">
+            <i class="bi bi-briefcase-fill text-primary"></i> Positions
+        </h1>
+        <p class="text-muted mb-0">Define roles and responsibilities</p>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'position_add' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-plus-circle-fill"></i> Add Position
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm animate__animated animate__fadeInUp">
+    <div class="card-header bg-white border-bottom py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-semibold">
+                <i class="bi bi-list-ul"></i> Position Directory
+            </h5>
+            <span class="badge bg-primary rounded-pill">{{ positions.count }} Positions</span>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <tr>
+                        <th class="px-4 py-3">
+                            <i class="bi bi-award"></i> Title
+                        </th>
+                        <th class="py-3">
+                            <i class="bi bi-file-text"></i> Description
+                        </th>
+                        <th class="py-3">
+                            <i class="bi bi-cash-stack"></i> Salary Range
+                        </th>
+                        <th class="py-3 text-center">
+                            <i class="bi bi-people"></i> Employees
+                        </th>
+                        <th class="py-3 text-center">
+                            <i class="bi bi-gear"></i> Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for position in positions %}
+                    <tr class="border-bottom">
+                        <td class="px-4">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                    <i class="bi bi-briefcase-fill text-primary"></i>
+                                </div>
+                                <strong class="fw-semibold">{{ position.title }}</strong>
+                            </div>
+                        </td>
+                        <td class="text-muted">
+                            {{ position.description|truncatewords:15|default:"No description" }}
+                        </td>
+                        <td>
+                            {% if position.min_salary and position.max_salary %}
+                            <div class="d-flex flex-column">
+                                <span class="badge bg-success-subtle text-success border border-success mb-1">
+                                    <i class="bi bi-currency-dollar"></i> {{ position.min_salary|floatformat:0 }}
+                                </span>
+                                <span class="badge bg-info-subtle text-info border border-info">
+                                    <i class="bi bi-currency-dollar"></i> {{ position.max_salary|floatformat:0 }}
+                                </span>
+                            </div>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-primary rounded-pill fs-6">
+                                {{ position.employee_count }} <i class="bi bi-people-fill"></i>
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{% url 'position_update' position.pk %}" class="btn btn-outline-success"
+                                    data-bs-toggle="tooltip" title="Edit Position">
+                                    <i class="bi bi-pencil-fill"></i> Edit
+                                </a>
+                                <a href="{% url 'employee_list' %}?position={{ position.pk }}"
+                                    class="btn btn-outline-primary" data-bs-toggle="tooltip" title="View Employees">
+                                    <i class="bi bi-people-fill"></i> View
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="bi bi-briefcase display-1 text-muted opacity-50"></i>
+                            </div>
+                            <h5 class="text-muted mb-2">No Positions Found</h5>
+                            <p class="text-muted mb-3">Create your first position to define roles</p>
+                            <a href="{% url 'position_add' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle-fill me-2"></i> Add First Position
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

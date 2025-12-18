@@ -1,0 +1,240 @@
+{% extends 'employee/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Employee Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-5 fw-bold">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </h1>
+        <p class="text-muted">Welcome to Employee Management System</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 stat-card animate__animated animate__fadeInUp">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2 text-uppercase small fw-semibold">Total Employees</h6>
+                        <h2 class="mb-0 fw-bold display-6">{{ total_employees }}</h2>
+                        <small class="text-success"><i class="bi bi-arrow-up"></i> 12% from last month</small>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-3">
+                        <i class="bi bi-people-fill fs-1 text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 stat-card animate__animated animate__fadeInUp"
+            style="animation-delay: 0.1s;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2 text-uppercase small fw-semibold">Active Employees</h6>
+                        <h2 class="mb-0 fw-bold text-success display-6">{{ active_employees }}</h2>
+                        <small class="text-success"><i class="bi bi-check-circle-fill"></i> All systems normal</small>
+                    </div>
+                    <div class="bg-success bg-opacity-10 p-3 rounded-3">
+                        <i class="bi bi-person-check-fill fs-1 text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 stat-card animate__animated animate__fadeInUp"
+            style="animation-delay: 0.2s;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2 text-uppercase small fw-semibold">On Leave</h6>
+                        <h2 class="mb-0 fw-bold text-warning display-6">{{ on_leave }}</h2>
+                        <small class="text-muted"><i class="bi bi-calendar-event"></i> Currently away</small>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 p-3 rounded-3">
+                        <i class="bi bi-calendar-x-fill fs-1 text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 stat-card animate__animated animate__fadeInUp"
+            style="animation-delay: 0.3s;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2 text-uppercase small fw-semibold">Departments</h6>
+                        <h2 class="mb-0 fw-bold text-info display-6">{{ total_departments }}</h2>
+                        <small class="text-info"><i class="bi bi-building"></i> Active divisions</small>
+                    </div>
+                    <div class="bg-info bg-opacity-10 p-3 rounded-3">
+                        <i class="bi bi-diagram-3-fill fs-1 text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Employees by Department Chart -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Employees by Department</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="departmentChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Hires -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0"><i class="bi bi-person-plus"></i> Recent Hires (Last 30 Days)</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_hires %}
+                <div class="list-group list-group-flush">
+                    {% for employee in recent_hires %}
+                    <a href="{% url 'employee_detail' employee.pk %}"
+                        class="list-group-item list-group-item-action border-0">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ employee.full_name }}</h6>
+                                <small class="text-muted">
+                                    {{ employee.position.title }} - {{ employee.department.name }}
+                                </small>
+                            </div>
+                            <small class="text-muted">{{ employee.date_joined|date:"M d, Y" }}</small>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-4">No recent hires</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Leave Requests -->
+    <div class="col-lg-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Pending Leave Requests</h5>
+                <span class="badge bg-warning">{{ pending_leave_requests }} Pending</span>
+            </div>
+            <div class="card-body">
+                {% if pending_leaves %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Leave Type</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Days</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for leave in pending_leaves %}
+                            <tr>
+                                <td>{{ leave.employee.full_name }}</td>
+                                <td><span class="badge bg-info">{{ leave.get_leave_type_display }}</span></td>
+                                <td>{{ leave.start_date|date:"M d, Y" }}</td>
+                                <td>{{ leave.end_date|date:"M d, Y" }}</td>
+                                <td>{{ leave.total_days }}</td>
+                                <td>
+                                    <form method="post" action="{% url 'leave_request_approve' leave.pk %}"
+                                        class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-success">
+                                            <i class="bi bi-check-circle"></i> Approve
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{% url 'leave_request_reject' leave.pk %}"
+                                        class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-x-circle"></i> Reject
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-4">No pending leave requests</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Department Chart
+    const deptCtx = document.getElementById('departmentChart');
+    if (deptCtx) {
+        const deptData = {{ employees_by_dept| safe
+    }};
+    const labels = [];
+    const data = [];
+
+    {% for dept in employees_by_dept %}
+    labels.push('{{ dept.name }}');
+    data.push({{ dept.count }});
+    {% endfor %}
+
+    new Chart(deptCtx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Employees',
+                data: data,
+                backgroundColor: 'rgba(13, 110, 253, 0.8)',
+                borderColor: 'rgba(13, 110, 253, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

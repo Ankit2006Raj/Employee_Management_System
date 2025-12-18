@@ -1,0 +1,60 @@
+{% extends 'employee/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - EMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4 animate__animated animate__fadeIn">
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold mb-2">
+            <i class="bi bi-{% if 'Add' in title %}person-plus-fill{% else %}pencil-square{% endif %} text-primary"></i>
+            {{ title }}
+        </h1>
+        <p class="text-muted mb-0">Fill in the employee information below</p>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'employee_list' %}" class="btn btn-outline-secondary btn-lg">
+            <i class="bi bi-arrow-left-circle"></i> Cancel
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card border-0 shadow-lg animate__animated animate__fadeInUp">
+            <div class="card-header py-3"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="bi bi-file-earmark-person-fill"></i> Employee Information Form
+                </h5>
+            </div>
+            <div class="card-body p-5">
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-4">
+                        {{ form|crispy }}
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a href="{% url 'employee_list' %}" class="btn btn-outline-secondary btn-lg px-5">
+                            <i class="bi bi-x-circle-fill"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <i class="bi bi-check-circle-fill"></i> {{ button_text }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="alert alert-info mt-4 animate__animated animate__fadeIn" style="animation-delay: 0.3s;">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <strong>Tip:</strong> All fields marked with an asterisk (*) are required. Make sure to fill them out before
+            submitting.
+        </div>
+    </div>
+</div>
+{% endblock %}

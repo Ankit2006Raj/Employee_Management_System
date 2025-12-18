@@ -1,0 +1,216 @@
+{% extends 'employee/base.html' %}
+{% load static %}
+
+{% block title %}Employee List - EMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4 animate__animated animate__fadeIn">
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold mb-2">
+            <i class="bi bi-people-fill text-primary"></i> Employees
+        </h1>
+        <p class="text-muted mb-0">Manage your workforce efficiently</p>
+    </div>
+    <div class="col-md-6 text-end">
+        <div class="btn-group" role="group">
+            <a href="{% url 'employee_add' %}" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-circle-fill"></i> Add Employee
+            </a>
+            <a href="/api/employees/export/" class="btn btn-success btn-lg">
+                <i class="bi bi-file-earmark-excel-fill"></i> Export
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="card border-0 shadow-sm mb-4 animate__animated animate__fadeIn">
+    <div class="card-body p-4">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small text-muted">
+                    <i class="bi bi-search"></i> Search Employees
+                </label>
+                {{ form.search }}
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small text-muted">
+                    <i class="bi bi-diagram-3"></i> Department
+                </label>
+                {{ form.department }}
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small text-muted">
+                    <i class="bi bi-briefcase"></i> Position
+                </label>
+                {{ form.position }}
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small text-muted">
+                    <i class="bi bi-toggle-on"></i> Status
+                </label>
+                {{ form.status }}
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 btn-lg">
+                    <i class="bi bi-funnel-fill"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Employee Table -->
+<div class="card border-0 shadow-sm animate__animated animate__fadeInUp">
+    <div class="card-header bg-white border-bottom py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-semibold">
+                <i class="bi bi-table"></i> Employee Directory
+            </h5>
+            <span class="badge bg-primary rounded-pill">{{ employees.count }} Total</span>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        {% if employees %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <tr>
+                        <th class="px-4 py-3">
+                            <i class="bi bi-hash"></i> ID
+                        </th>
+                        <th class="py-3">
+                            <i class="bi bi-person"></i> Name
+                        </th>
+                        <th class="py-3">
+                            <i class="bi bi-envelope"></i> Email
+                        </th>
+                        <th class="py-3">
+                            <i class="bi bi-telephone"></i> Phone
+                        </th>
+                        <th class="py-3">
+                            <i class="bi bi-building"></i> Department
+                        </th>
+                        <th class="py-3">
+                            <i class="bi bi-briefcase"></i> Position
+                        </th>
+                        <th class="py-3">
+                            <i class="bi bi-toggle-on"></i> Status
+                        </th>
+                        <th class="py-3 text-center">
+                            <i class="bi bi-gear"></i> Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr class="border-bottom">
+                        <td class="px-4">
+                            <span class="badge bg-light text-dark fw-bold">{{ employee.employee_id }}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-2">
+                                    <i class="bi bi-person-fill text-primary"></i>
+                                </div>
+                                <a href="{% url 'employee_detail' employee.pk %}"
+                                    class="text-decoration-none fw-semibold text-dark">
+                                    {{ employee.full_name }}
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="mailto:{{ employee.email }}" class="text-decoration-none text-muted">
+                                {{ employee.email }}
+                            </a>
+                        </td>
+                        <td class="text-muted">{{ employee.phone|default:"-" }}</td>
+                        <td>
+                            <span class="badge bg-light text-dark">{{ employee.department.name }}</span>
+                        </td>
+                        <td class="text-muted">{{ employee.position.title }}</td>
+                        <td>
+                            {% if employee.status == 'active' %}
+                            <span class="badge bg-success-subtle text-success border border-success">
+                                <i class="bi bi-check-circle-fill"></i> Active
+                            </span>
+                            {% elif employee.status == 'on_leave' %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning">
+                                <i class="bi bi-calendar-x"></i> On Leave
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ employee.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{% url 'employee_detail' employee.pk %}" class="btn btn-outline-primary"
+                                    data-bs-toggle="tooltip" title="View Details">
+                                    <i class="bi bi-eye-fill"></i>
+                                </a>
+                                <a href="{% url 'employee_update' employee.pk %}" class="btn btn-outline-success"
+                                    data-bs-toggle="tooltip" title="Edit Employee">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                <a href="{% url 'employee_delete' employee.pk %}" class="btn btn-outline-danger"
+                                    data-bs-toggle="tooltip" title="Delete Employee">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Last</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5 px-4">
+            <div class="mb-4">
+                <i class="bi bi-people display-1 text-muted opacity-50"></i>
+            </div>
+            <h4 class="text-muted mb-2">No Employees Found</h4>
+            <p class="text-muted mb-4">Get started by adding your first employee to the system</p>
+            <a href="{% url 'employee_add' %}" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-circle-fill me-2"></i> Add First Employee
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

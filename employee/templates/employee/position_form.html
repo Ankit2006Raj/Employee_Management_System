@@ -1,0 +1,38 @@
+{% extends 'employee/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - EMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="display-6 fw-bold">{{ title }}</h1>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'position_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Cancel
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle"></i> {{ button_text }}
+                        </button>
+                        <a href="{% url 'position_list' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

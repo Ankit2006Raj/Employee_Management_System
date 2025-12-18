@@ -1,0 +1,242 @@
+{% extends 'employee/base.html' %}
+
+{% block title %}{{ employee.full_name }} - Employee Details{% endblock %}
+
+{% block content %}
+<div class="row mb-4 animate__animated animate__fadeIn">
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold mb-2">
+            <i class="bi bi-person-badge-fill text-primary"></i> Employee Profile
+        </h1>
+        <p class="text-muted mb-0">Complete employee information</p>
+    </div>
+    <div class="col-md-6 text-end">
+        <div class="btn-group" role="group">
+            <a href="{% url 'employee_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Back
+            </a>
+            <a href="{% url 'employee_update' employee.pk %}" class="btn btn-success">
+                <i class="bi bi-pencil-fill"></i> Edit
+            </a>
+            <a href="{% url 'employee_delete' employee.pk %}" class="btn btn-danger">
+                <i class="bi bi-trash-fill"></i> Delete
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Basic Information -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-lg animate__animated animate__fadeInLeft">
+            <div class="card-body text-center p-4">
+                {% if employee.photo %}
+                <img src="{{ employee.photo.url }}" alt="{{ employee.full_name }}"
+                    class="rounded-circle mb-3 border border-4 border-primary shadow-lg"
+                    style="width: 180px; height: 180px; object-fit: cover;">
+                {% else %}
+                <div class="bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-lg"
+                    style="width: 180px; height: 180px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="bi bi-person-fill fs-1 text-white"></i>
+                </div>
+                {% endif %}
+                <h3 class="mb-2 fw-bold">{{ employee.full_name }}</h3>
+                <p class="text-muted mb-2 fw-semibold">{{ employee.position.title }}</p>
+                <p class="text-muted small mb-3">
+                    <i class="bi bi-building-fill"></i> {{ employee.department.name }}
+                </p>
+                <span
+                    class="badge {% if employee.status == 'active' %}bg-success{% elif employee.status == 'on_leave' %}bg-warning{% else %}bg-secondary{% endif %} mb-3 px-3 py-2 fs-6">
+                    <i
+                        class="bi bi-{% if employee.status == 'active' %}check-circle-fill{% elif employee.status == 'on_leave' %}calendar-x{% else %}dash-circle{% endif %}"></i>
+                    {{ employee.get_status_display }}
+                </span>
+                <hr class="my-3">
+                <div class="d-grid gap-2">
+                    <a href="mailto:{{ employee.email }}" class="btn btn-outline-primary">
+                        <i class="bi bi-envelope-fill"></i> Send Email
+                    </a>
+                    {% if employee.phone %}
+                    <a href="tel:{{ employee.phone }}" class="btn btn-outline-success">
+                        <i class="bi bi-telephone-fill"></i> Call {{ employee.phone }}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Information -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm mb-4 animate__animated animate__fadeInRight">
+            <div class="card-header py-3"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="bi bi-person-badge-fill"></i> Personal Information
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="info-item p-3 bg-light rounded-3">
+                            <label class="text-muted small text-uppercase fw-semibold d-block mb-1">
+                                <i class="bi bi-hash"></i> Employee ID
+                            </label>
+                            <p class="fw-bold mb-0 fs-5">{{ employee.employee_id }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item p-3 bg-light rounded-3">
+                            <label class="text-muted small text-uppercase fw-semibold d-block mb-1">
+                                <i class="bi bi-calendar-event"></i> Date of Birth
+                            </label>
+                            <p class="fw-bold mb-0 fs-5">{{ employee.date_of_birth|date:"M d, Y"|default:"-" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item p-3 bg-light rounded-3">
+                            <label class="text-muted small text-uppercase fw-semibold d-block mb-1">
+                                <i class="bi bi-gender-ambiguous"></i> Gender
+                            </label>
+                            <p class="fw-bold mb-0 fs-5">{{ employee.get_gender_display }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item p-3 bg-light rounded-3">
+                            <label class="text-muted small text-uppercase fw-semibold d-block mb-1">
+                                <i class="bi bi-person-vcard"></i> Age
+                            </label>
+                            <p class="fw-bold mb-0 fs-5">{{ employee.age|default:"-" }} years</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4 animate__animated animate__fadeInRight" style="animation-delay: 0.1s;">
+            <div class="card-header py-3"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="bi bi-briefcase-fill"></i> Employment Information
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="info-item p-3 bg-light rounded-3">
+                            <label class="text-muted small text-uppercase fw-semibold d-block mb-1">
+                                <i class="bi bi-building"></i> Department
+                            </label>
+                            <p class="fw-bold mb-0 fs-5">{{ employee.department.name }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item p-3 bg-light rounded-3">
+                            <label class="text-muted small text-uppercase fw-semibold d-block mb-1">
+                                <i class="bi bi-award"></i> Position
+                            </label>
+                            <p class="fw-bold mb-0 fs-5">{{ employee.position.title }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item p-3 bg-light rounded-3">
+                            <label class="text-muted small text-uppercase fw-semibold d-block mb-1">
+                                <i class="bi bi-file-earmark-person"></i> Employment Type
+                            </label>
+                            <p class="fw-bold mb-0 fs-5">{{ employee.get_employment_type_display }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item p-3 bg-light rounded-3">
+                            <label class="text-muted small text-uppercase fw-semibold d-block mb-1">
+                                <i class="bi bi-calendar-check"></i> Date Joined
+                            </label>
+                            <p class="fw-bold mb-0 fs-5">{{ employee.date_joined|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item p-3 bg-success bg-opacity-10 rounded-3 border border-success">
+                            <label class="text-success small text-uppercase fw-semibold d-block mb-1">
+                                <i class="bi bi-trophy-fill"></i> Years of Service
+                            </label>
+                            <p class="fw-bold mb-0 fs-4 text-success">{{ employee.years_of_service }} years</p>
+                        </div>
+                    </div>
+                    {% if employee.manager %}
+                    <div class="col-md-6">
+                        <div class="info-item p-3 bg-primary bg-opacity-10 rounded-3 border border-primary">
+                            <label class="text-primary small text-uppercase fw-semibold d-block mb-1">
+                                <i class="bi bi-person-badge"></i> Reports To
+                            </label>
+                            <p class="fw-bold mb-0 fs-5">
+                                <a href="{% url 'employee_detail' employee.manager.pk %}" class="text-decoration-none">
+                                    {{ employee.manager.full_name }} <i class="bi bi-arrow-right-circle"></i>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if employee.address_line1 %}
+        <div class="card border-0 shadow-sm mb-4 animate__animated animate__fadeInRight" style="animation-delay: 0.2s;">
+            <div class="card-header py-3"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="bi bi-geo-alt-fill"></i> Address Information
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="p-3 bg-light rounded-3">
+                    <p class="mb-0 fs-5">
+                        <i class="bi bi-house-door-fill text-primary me-2"></i>
+                        {{ employee.address_line1 }}<br>
+                        {% if employee.address_line2 %}
+                        <span class="ms-4">{{ employee.address_line2 }}</span><br>
+                        {% endif %}
+                        <span class="ms-4">{{ employee.city }}, {{ employee.state }} {{ employee.postal_code
+                            }}</span><br>
+                        <span class="ms-4"><strong>{{ employee.country }}</strong></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Subordinates -->
+{% if subordinates %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0"><i class="bi bi-diagram-3"></i> Direct Reports ({{ subordinates.count }})</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for subordinate in subordinates %}
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <a href="{% url 'employee_detail' subordinate.pk %}">
+                                        {{ subordinate.full_name }}
+                                    </a>
+                                </h6>
+                                <p class="card-text small text-muted mb-0">
+                                    {{ subordinate.position.title }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

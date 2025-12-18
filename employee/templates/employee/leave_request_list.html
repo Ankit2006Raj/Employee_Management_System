@@ -1,0 +1,121 @@
+{% extends 'employee/base.html' %}
+
+{% block title %}Leave Requests - EMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="display-6 fw-bold">
+            <i class="bi bi-calendar-check"></i> Leave Requests
+        </h1>
+    </div>
+    <div class="col-md-6 text-end">
+        <div class="btn-group" role="group">
+            <a href="?status=" class="btn btn-outline-primary {% if not request.GET.status %}active{% endif %}">All</a>
+            <a href="?status=pending"
+                class="btn btn-outline-warning {% if request.GET.status == 'pending' %}active{% endif %}">Pending</a>
+            <a href="?status=approved"
+                class="btn btn-outline-success {% if request.GET.status == 'approved' %}active{% endif %}">Approved</a>
+            <a href="?status=rejected"
+                class="btn btn-outline-danger {% if request.GET.status == 'rejected' %}active{% endif %}">Rejected</a>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Employee</th>
+                        <th>Leave Type</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Days</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for leave in leave_requests %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'employee_detail' leave.employee.pk %}">
+                                {{ leave.employee.full_name }}
+                            </a>
+                        </td>
+                        <td><span class="badge bg-info">{{ leave.get_leave_type_display }}</span></td>
+                        <td>{{ leave.start_date|date:"M d, Y" }}</td>
+                        <td>{{ leave.end_date|date:"M d, Y" }}</td>
+                        <td>{{ leave.total_days }}</td>
+                        <td>
+                            {% if leave.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                            {% elif leave.status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                            {% elif leave.status == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ leave.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if leave.status == 'pending' %}
+                            <form method="post" action="{% url 'leave_request_approve' leave.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    <i class="bi bi-check-circle"></i> Approve
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'leave_request_reject' leave.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-x-circle"></i> Reject
+                                </button>
+                            </form>
+                            {% else %}
+                            <small class="text-muted">
+                                {{ leave.get_status_display }} by {{ leave.approved_by.get_full_name }}
+                            </small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            No leave requests found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Previous</a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
